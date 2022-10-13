@@ -9,8 +9,12 @@ import LoginScreen from './screens/Login';
 import SignupScreen from './screens/SignUp';
 import WelcomeScreen from './screens/Welcome';
 import { Colors } from './constants/styles';
-import AuthContextProvider, { AuthContext } from './store/auth-context';
+//import AuthContextProvider, { AuthContext } from './store/auth-context';
 import IconButton from './components/ui/IconButton';
+import { Provider } from 'react-redux';
+import { store } from './redux/store';
+import { useDispatch, useSelector } from 'react-redux';
+import { authenticate, logout } from './redux/AuthSlice';
 
 const Stack = createNativeStackNavigator();
 
@@ -29,7 +33,9 @@ function AuthStack() {
 }
 
 function AuthenticatedStack() {
-  const authCtx = useContext(AuthContext);
+  //const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
+
   return (
     <Stack.Navigator
       screenOptions={{
@@ -47,7 +53,8 @@ function AuthenticatedStack() {
               icon="exit"
               color={tintColor}
               size={24}
-              onPress={authCtx.logout}
+              //onPress={authCtx.logout}
+              onPress={() => dispatch(logout())}
             />
           ),
         }}
@@ -57,24 +64,29 @@ function AuthenticatedStack() {
 }
 
 function Navigation() {
-  const authCtx = useContext(AuthContext);
+  //const authCtx = useContext(AuthContext);
+  const isAuthenticated = useSelector(state => state.auth.isAuthenticated);
   return (
     <NavigationContainer>
-      {!authCtx.isAuthenticated && <AuthStack />}
-      {authCtx.isAuthenticated && <AuthenticatedStack />}
+      {/*!authCtx.isAuthenticated && <AuthStack />*/}
+      {/*authCtx.isAuthenticated && <AuthenticatedStack />*/}
+      {!isAuthenticated && <AuthStack />}
+      {isAuthenticated && <AuthenticatedStack />}
     </NavigationContainer>
   );
 }
 
 function Root() {
-  const authCtx = useContext(AuthContext);
+  //const authCtx = useContext(AuthContext);
+  const dispatch = useDispatch();
   const [appIsReady, setAppIsReady] = useState(false);
 
   useEffect(() => {
     async function fetchToken() {
       const storedToken = await AsyncStorage.getItem('token');
       if (storedToken) {
-        authCtx.authenticate(storedToken);
+        //authCtx.authenticate(storedToken);
+        dispatch(authenticate(storedToken));
       }
       setAppIsReady(true);
     }
@@ -102,9 +114,11 @@ export default function App() {
   return (
     <>
       <StatusBar style="light" />
-      <AuthContextProvider>
+      {/* <AuthContextProvider> */}
+      <Provider store={store}>
         <Root />
-      </AuthContextProvider>
+      </Provider>
+      {/* </AuthContextProvider> */}
     </>
   );
 }

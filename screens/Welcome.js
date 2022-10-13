@@ -1,14 +1,16 @@
 import axios from 'axios';
-import { useContext, useEffect, useState } from 'react';
+import { /*useContext,*/ useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
-import { AuthContext } from '../store/auth-context';
+//import { AuthContext } from '../store/auth-context';
+import { useSelector } from 'react-redux';
 
 const AUTH_URL = 'https://expense-tracker-bfea8-default-rtdb.firebaseio.com/message.json?auth=';
 
 function WelcomeScreen() {
   const [fetchedMessage, setFetchedMesssage] = useState('');
-  const authCtx = useContext(AuthContext);
-  const token = authCtx.token;
+  //const authCtx = useContext(AuthContext);
+  //const token = authCtx.token;
+  const token = useSelector(state => state.auth.token);
 
   useEffect(() => {
     axios.get(AUTH_URL + token)
